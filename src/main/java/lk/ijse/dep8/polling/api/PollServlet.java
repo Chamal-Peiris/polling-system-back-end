@@ -4,6 +4,9 @@ import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
 import jakarta.json.bind.JsonbException;
 import lk.ijse.dep8.polling.dto.PollDTO;
+import lk.ijse.dep8.polling.service.ServiceFactory;
+import lk.ijse.dep8.polling.service.SuperService;
+import lk.ijse.dep8.polling.service.custom.PollService;
 import lk.ijse.dep8.polling.util.HttpServlet2;
 import lk.ijse.dep8.polling.util.ResponseStatusException;
 
@@ -12,6 +15,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -50,6 +54,9 @@ public class PollServlet extends HttpServlet2 {
             } else if (pollDTO.getTitle() == null || pollDTO.getTitle().trim().isEmpty()) {
                 throw new ResponseStatusException(400, "Invalid title");
             }
+            PollService pollService = ServiceFactory.getInstance().getService(ServiceFactory.ServiceType.POLL);
+            pollService.updatePoll(pollDTO);
+            resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
 
             /*Todo:Request to update this pol from service layer*/
         } catch (JsonbException e) {
@@ -59,14 +66,23 @@ public class PollServlet extends HttpServlet2 {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        PollService pollService = ServiceFactory.getInstance().getService(ServiceFactory.ServiceType.POLL);
+        Jsonb jsonb = JsonbBuilder.create();
         if (req.getPathInfo() == null || req.getPathInfo().equals("/")) {
             System.out.println("get all polls");
+            List<PollDTO> pollDTOS = pollService.listAllPoll();
+            resp.setContentType("application/json");
+            jsonb.toJson(pollDTOS, resp.getWriter());
+
         } else {
 
-
-            int polId = getPollId(req);
-            //System.out.println("Get a Poll");
             /*Todo:Get a poll from the service layer*/
+            int polId = getPollId(req);
+            PollDTO poll = pollService.getPoll(polId);
+            resp.setContentType("application/json");
+            jsonb.toJson(poll, resp.getWriter());
+            //System.out.println("Get a Poll");
+
 
         }
     }
@@ -75,7 +91,9 @@ public class PollServlet extends HttpServlet2 {
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
        /*validate the URL*/
         int polId=getPollId(req);
-
+        PollService pollService = ServiceFactory.getInstance().getService(ServiceFactory.ServiceType.POLL);
+        pollService.deletePoll(polId);
+        resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
         /*todo: Send a request to delete this poll to the service layer*/
 
     }
@@ -103,6 +121,11 @@ public class PollServlet extends HttpServlet2 {
             } else if (pollDTO.getTitle() == null || pollDTO.getTitle().trim().isEmpty()) {
                 throw new ResponseStatusException(400, "Invalid title");
             }
+            PollService pollService = ServiceFactory.getInstance().getService(ServiceFactory.ServiceType.POLL);
+            PollDTO pollDTO1 = pollService.savePoll(pollDTO);
+            resp.setContentType("application/json");
+            resp.setStatus(HttpServletResponse.SC_CREATED);
+            jsonb.toJson(pollDTO1,resp.getWriter());
 
             /*Todo:Request to save this pol from service*/
         } catch (JsonbException e) {
