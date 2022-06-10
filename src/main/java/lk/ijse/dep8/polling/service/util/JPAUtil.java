@@ -12,7 +12,7 @@ public abstract class JPAUtil {
         Properties properties = new Properties();
         try {
             String profile=System.getProperty("app.profiles.active","test");
-            properties.load(  JPAUtil.class.getResourceAsStream(profile.equals("test")?"/application-test.properties":"application.properties"));
+            properties.load(  JPAUtil.class.getResourceAsStream(profile.equals("test")?"/application-test.properties":"/application.properties"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

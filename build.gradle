@@ -40,6 +40,9 @@ dependencies {
     // https://mvnrepository.com/artifact/org.eclipse/yasson
     // https://mvnrepository.com/artifact/org.modelmapper/modelmapper
     implementation group: 'org.modelmapper', name: 'modelmapper', version: '3.1.0'
+    // https://mvnrepository.com/artifact/mysql/mysql-connector-java
+    implementation group: 'mysql', name: 'mysql-connector-java', version: '8.0.29'
+
 
 
 
