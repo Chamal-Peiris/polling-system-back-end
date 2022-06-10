@@ -63,7 +63,7 @@ public class PollServlet extends HttpServlet2 {
         } catch (JsonbException e) {
             throw new ResponseStatusException(400, "Invalid JSON");
         } catch (NotFoundException e) {
-            throw new RuntimeException(e);
+            throw new ResponseStatusException(404,"Invalid pol ID");
         }
     }
 
@@ -89,9 +89,7 @@ public class PollServlet extends HttpServlet2 {
             } catch (NotFoundException e) {
                 throw new ResponseStatusException(404,"Invalid ID");
             }
-
             //System.out.println("Get a Poll");
-
 
         }
     }
@@ -105,7 +103,7 @@ public class PollServlet extends HttpServlet2 {
             pollService.deletePoll(polId);
             resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
         } catch (NotFoundException e) {
-            throw new RuntimeException(e);
+            throw new ResponseStatusException(404,"Invalid pol ID");
         }
 
         /*todo: Send a request to delete this poll to the service layer*/
