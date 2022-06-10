@@ -7,6 +7,7 @@ import lk.ijse.dep8.polling.dto.PollDTO;
 import lk.ijse.dep8.polling.service.ServiceFactory;
 import lk.ijse.dep8.polling.service.SuperService;
 import lk.ijse.dep8.polling.service.custom.PollService;
+import lk.ijse.dep8.polling.service.exception.NotFoundException;
 import lk.ijse.dep8.polling.util.HttpServlet2;
 import lk.ijse.dep8.polling.util.ResponseStatusException;
 
@@ -32,7 +33,7 @@ public class PollServlet extends HttpServlet2 {
     @Override
     protected void doPatch(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         /*validate the url*/
-        int pollId=getPollId(req);
+        int pollId = getPollId(req);
 
         /*validate the content type*/
         if (req.getContentType() == null || !req.getContentType().toLowerCase().startsWith("application/json")) {
@@ -42,25 +43,27 @@ public class PollServlet extends HttpServlet2 {
         try {
             Jsonb jsonb = JsonbBuilder.create();
             PollDTO pollDTO = jsonb.fromJson(req.getReader(), PollDTO.class);
-            if (pollDTO.getId() != null&&pollDTO.getId()!=pollId) {
+            if (pollDTO.getId() != null && pollDTO.getId() != pollId) {
                 throw new ResponseStatusException(400, "Id Mismatch error");
             } else if (pollDTO.getCreatedBy() == null || pollDTO.getCreatedBy().trim().isEmpty()) {
                 throw new ResponseStatusException(400, "Invalid user");
-            }
-            else if (pollDTO.getUpVotes()==null||pollDTO.getDownVotes()==null){
+            } else if (pollDTO.getUpVotes() == null || pollDTO.getDownVotes() == null) {
                 throw new ResponseStatusException(400, "Insert the up and down votes");
-            }else if (pollDTO.getUpVotes() < 0 || pollDTO.getDownVotes() < 0) {
+            } else if (pollDTO.getUpVotes() < 0 || pollDTO.getDownVotes() < 0) {
                 throw new ResponseStatusException(400, "vote count shouldn't be negative");
             } else if (pollDTO.getTitle() == null || pollDTO.getTitle().trim().isEmpty()) {
                 throw new ResponseStatusException(400, "Invalid title");
             }
             PollService pollService = ServiceFactory.getInstance().getService(ServiceFactory.ServiceType.POLL);
+            pollDTO.setId(pollId);
             pollService.updatePoll(pollDTO);
             resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
 
             /*Todo:Request to update this pol from service layer*/
         } catch (JsonbException e) {
             throw new ResponseStatusException(400, "Invalid JSON");
+        } catch (NotFoundException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -78,9 +81,15 @@ public class PollServlet extends HttpServlet2 {
 
             /*Todo:Get a poll from the service layer*/
             int polId = getPollId(req);
-            PollDTO poll = pollService.getPoll(polId);
-            resp.setContentType("application/json");
-            jsonb.toJson(poll, resp.getWriter());
+            PollDTO poll = null;
+            try {
+                poll = pollService.getPoll(polId);
+                resp.setContentType("application/json");
+                jsonb.toJson(poll, resp.getWriter());
+            } catch (NotFoundException e) {
+                throw new ResponseStatusException(404,"Invalid ID");
+            }
+
             //System.out.println("Get a Poll");
 
 
@@ -89,11 +98,16 @@ public class PollServlet extends HttpServlet2 {
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-       /*validate the URL*/
-        int polId=getPollId(req);
+        /*validate the URL*/
+        int polId = getPollId(req);
         PollService pollService = ServiceFactory.getInstance().getService(ServiceFactory.ServiceType.POLL);
-        pollService.deletePoll(polId);
-        resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
+        try {
+            pollService.deletePoll(polId);
+            resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
+        } catch (NotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
         /*todo: Send a request to delete this poll to the service layer*/
 
     }
@@ -116,7 +130,7 @@ public class PollServlet extends HttpServlet2 {
                 throw new ResponseStatusException(400, "Id should be empty");
             } else if (pollDTO.getCreatedBy() == null || pollDTO.getCreatedBy().trim().isEmpty()) {
                 throw new ResponseStatusException(400, "Invalid user");
-            } else if ((pollDTO.getUpVotes()!=null&&pollDTO.getUpVotes() != 0) ||(pollDTO.getUpVotes()!=null&& pollDTO.getDownVotes() != 0)) {
+            } else if ((pollDTO.getUpVotes() != null && pollDTO.getUpVotes() != 0) || (pollDTO.getUpVotes() != null && pollDTO.getDownVotes() != 0)) {
                 throw new ResponseStatusException(400, "Invalid votes");
             } else if (pollDTO.getTitle() == null || pollDTO.getTitle().trim().isEmpty()) {
                 throw new ResponseStatusException(400, "Invalid title");
@@ -125,7 +139,7 @@ public class PollServlet extends HttpServlet2 {
             PollDTO pollDTO1 = pollService.savePoll(pollDTO);
             resp.setContentType("application/json");
             resp.setStatus(HttpServletResponse.SC_CREATED);
-            jsonb.toJson(pollDTO1,resp.getWriter());
+            jsonb.toJson(pollDTO1, resp.getWriter());
 
             /*Todo:Request to save this pol from service*/
         } catch (JsonbException e) {
