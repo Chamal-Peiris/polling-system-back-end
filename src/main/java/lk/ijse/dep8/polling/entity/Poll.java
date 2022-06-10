@@ -20,4 +20,10 @@ public class Poll implements SuperEntity{
     @Column(name = "create_by",nullable = false)
     private String createdBy;
 
+    public Poll(String title, int upVotes, int downVotes, String createdBy) {
+        this.title = title;
+        this.upVotes = upVotes;
+        this.downVotes = downVotes;
+        this.createdBy = createdBy;
+    }
 }

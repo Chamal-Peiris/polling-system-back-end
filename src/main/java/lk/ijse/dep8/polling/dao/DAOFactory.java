@@ -1,4 +1,4 @@
 package lk.ijse.dep8.polling.dao;
 
-public interface SuperDao {
+public class DAOFactory {
 }
