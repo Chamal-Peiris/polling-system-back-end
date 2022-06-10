@@ -15,28 +15,60 @@ import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@WebServlet(name = "polServlet",urlPatterns = "/api/v1/polls/*")
+@WebServlet(name = "polServlet", urlPatterns = "/api/v1/polls/*")
 public class PollServlet extends HttpServlet2 {
+
+    private int getPollId(HttpServletRequest req) {
+        if (req.getPathInfo() == null) throw new RuntimeException("Invalid path");
+        Matcher matcher = Pattern.compile("^/(\\d+)/?$").matcher(req.getPathInfo());
+        if (!req.getPathInfo().matches("/(\\d+)/?")) {
+            System.out.println("Invalid");
+        }
+        int polId = Integer.parseInt(matcher.group(1));
+        return polId;
+    }
+
     @Override
     protected void doPatch(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        System.out.println("patch");
+        /*validate the url*/
+        int pollId=getPollId(req);
+
+        /*validate the content type*/
+        if (req.getContentType() == null || !req.getContentType().toLowerCase().startsWith("application/json")) {
+            System.out.println("Invalid content Type");
+        }
+
+        try {
+            Jsonb jsonb = JsonbBuilder.create();
+            PollDTO pollDTO = jsonb.fromJson(req.getReader(), PollDTO.class);
+            if (pollDTO.getId() != null&&pollDTO.getId()!=pollId) {
+                throw new ResponseStatusException(400, "Id Mismatch error");
+            } else if (pollDTO.getCreatedBy() == null || pollDTO.getCreatedBy().trim().isEmpty()) {
+                throw new ResponseStatusException(400, "Invalid user");
+            } else if (pollDTO.getUpVotes() < 0 || pollDTO.getDownVotes() < 0) {
+                throw new ResponseStatusException(400, "vote count shouldn't be negative");
+            } else if (pollDTO.getTitle() == null || pollDTO.getTitle().trim().isEmpty()) {
+                throw new ResponseStatusException(400, "Invalid title");
+            }
+
+            /*Todo:Request to update this pol from service layer*/
+        } catch (JsonbException e) {
+            throw new ResponseStatusException(400, "Invalid JSON");
+        }
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-       if(req.getPathInfo()==null||req.getPathInfo().equals("/")){
-           System.out.println("get all polls");
-       }else{
+        if (req.getPathInfo() == null || req.getPathInfo().equals("/")) {
+            System.out.println("get all polls");
+        } else {
 
-           Matcher matcher = Pattern.compile("^/(\\d+)/?$").matcher(req.getPathInfo());
-           if(!req.getPathInfo().matches("/(\\d+)/?")){
-               System.out.println("Invalid");
-           }
-           int polId=Integer.parseInt(matcher.group(1));
-           //System.out.println("Get a Poll");
-           /*Todo:Get a poll from the service layer*/
 
-       }
+            int polId = getPollId(req);
+            //System.out.println("Get a Poll");
+            /*Todo:Get a poll from the service layer*/
+
+        }
     }
 
     @Override
@@ -47,30 +79,30 @@ public class PollServlet extends HttpServlet2 {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         /*validate the url*/
-        if(req.getPathInfo()!=null&&!req.getPathInfo().equals("/")){
+        if (req.getPathInfo() != null && !req.getPathInfo().equals("/")) {
             System.out.println("Invalid End Point");
         }
         /*validate the content type*/
-        if(req.getContentType()==null||!req.getContentType().toLowerCase().startsWith("application/json")){
+        if (req.getContentType() == null || !req.getContentType().toLowerCase().startsWith("application/json")) {
             System.out.println("Invalid content Type");
         }
 
-        try{
+        try {
             Jsonb jsonb = JsonbBuilder.create();
             PollDTO pollDTO = jsonb.fromJson(req.getReader(), PollDTO.class);
-            if(pollDTO.getId()!=null){
-                throw new ResponseStatusException(400,"Id should be empty");
-            } else if (pollDTO.getCreatedBy()==null||pollDTO.getCreatedBy().trim().isEmpty()) {
-                throw new ResponseStatusException(400,"Invalid user");
-            }else if(pollDTO.getUpVotes() != 0||pollDTO.getDownVotes()!=0){
-                throw new ResponseStatusException(400,"Invalid votes");
-            } else if (pollDTO.getTitle()==null||pollDTO.getTitle().trim().isEmpty()) {
-                throw new ResponseStatusException(400,"Invalid title");
+            if (pollDTO.getId() != null) {
+                throw new ResponseStatusException(400, "Id should be empty");
+            } else if (pollDTO.getCreatedBy() == null || pollDTO.getCreatedBy().trim().isEmpty()) {
+                throw new ResponseStatusException(400, "Invalid user");
+            } else if (pollDTO.getUpVotes() != 0 || pollDTO.getDownVotes() != 0) {
+                throw new ResponseStatusException(400, "Invalid votes");
+            } else if (pollDTO.getTitle() == null || pollDTO.getTitle().trim().isEmpty()) {
+                throw new ResponseStatusException(400, "Invalid title");
             }
 
             /*Todo:Request to save this pol from service*/
-        }catch (JsonbException e){
-            throw new ResponseStatusException(400,"Invalid JSON");
+        } catch (JsonbException e) {
+            throw new ResponseStatusException(400, "Invalid JSON");
         }
     }
 }
