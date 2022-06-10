@@ -1,4 +1,6 @@
 package lk.ijse.dep8.polling.dao.custom.impl;
 
-public class QueryDaoImpl {
+import lk.ijse.dep8.polling.dao.custom.QueryDao;
+
+public class QueryDaoImpl implements QueryDao {
 }

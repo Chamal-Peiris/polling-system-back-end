@@ -1,4 +1,6 @@
 package lk.ijse.dep8.polling.dao.custom;
 
-public interface QueryDao {
+import lk.ijse.dep8.polling.dao.SuperDao;
+
+public interface QueryDao extends SuperDao {
 }
