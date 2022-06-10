@@ -11,7 +11,8 @@ public abstract class JPAUtil {
     private static EntityManagerFactory buildEntityManagerFactory(){
         Properties properties = new Properties();
         try {
-            properties.load(  JPAUtil.class.getResourceAsStream("/application-test.properties"));
+            String profile=System.getProperty("app.profiles.active","test");
+            properties.load(  JPAUtil.class.getResourceAsStream(profile.equals("test")?"/application-test.properties":"application.properties"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
