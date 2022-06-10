@@ -45,7 +45,10 @@ public class PollServlet extends HttpServlet2 {
                 throw new ResponseStatusException(400, "Id Mismatch error");
             } else if (pollDTO.getCreatedBy() == null || pollDTO.getCreatedBy().trim().isEmpty()) {
                 throw new ResponseStatusException(400, "Invalid user");
-            } else if (pollDTO.getUpVotes() < 0 || pollDTO.getDownVotes() < 0) {
+            }
+            else if (pollDTO.getUpVotes()==null||pollDTO.getDownVotes()==null){
+                throw new ResponseStatusException(400, "Insert the up and down votes");
+            }else if (pollDTO.getUpVotes() < 0 || pollDTO.getDownVotes() < 0) {
                 throw new ResponseStatusException(400, "vote count shouldn't be negative");
             } else if (pollDTO.getTitle() == null || pollDTO.getTitle().trim().isEmpty()) {
                 throw new ResponseStatusException(400, "Invalid title");
@@ -73,7 +76,11 @@ public class PollServlet extends HttpServlet2 {
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        System.out.println("delete");
+       /*validate the URL*/
+        int polId=getPollId(req);
+
+        /*todo: Send a request to delete this poll to the service layer*/
+
     }
 
     @Override
@@ -94,7 +101,7 @@ public class PollServlet extends HttpServlet2 {
                 throw new ResponseStatusException(400, "Id should be empty");
             } else if (pollDTO.getCreatedBy() == null || pollDTO.getCreatedBy().trim().isEmpty()) {
                 throw new ResponseStatusException(400, "Invalid user");
-            } else if (pollDTO.getUpVotes() != 0 || pollDTO.getDownVotes() != 0) {
+            } else if ((pollDTO.getUpVotes()!=null&&pollDTO.getUpVotes() != 0) ||(pollDTO.getUpVotes()!=null&& pollDTO.getDownVotes() != 0)) {
                 throw new ResponseStatusException(400, "Invalid votes");
             } else if (pollDTO.getTitle() == null || pollDTO.getTitle().trim().isEmpty()) {
                 throw new ResponseStatusException(400, "Invalid title");

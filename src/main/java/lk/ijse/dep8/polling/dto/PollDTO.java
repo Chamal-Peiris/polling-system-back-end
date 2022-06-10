@@ -9,8 +9,8 @@ import java.io.Serializable;
 public class PollDTO implements Serializable {
     private Integer id;
     private String title;
-    private int upVotes;
-    private int downVotes;
+    private Integer upVotes;
+    private Integer downVotes;
     private String createdBy;
 
     public PollDTO(String title, int upVotes, int downVotes, String createdBy) {
