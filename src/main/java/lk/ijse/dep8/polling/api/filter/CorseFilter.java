@@ -12,12 +12,11 @@ public class CorseFilter extends HttpFilter {
     @Override
     protected void doFilter(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
         String origin=req.getHeader("Origin");
-        if (origin != null && origin.contains(getServletContext().getInitParameter("origin"))){
-            res.setHeader("Access-Control-Allow-Origin",origin);
+        if (origin != null){
+            res.setHeader("Access-Control-Allow-Origin","*");
             res.setHeader("Access-Control-Allow-Headers","Content-Type");
-            res.setHeader("Access-Control-Expose-Headers","Content-Type,X-Count");
             if(req.getMethod().equals("OPTIONS")){
-                res.setHeader("Access-Control-Allow-Methods","GET,POST,PUT,DELETE,HEAD");
+                res.setHeader("Access-Control-Allow-Methods","GET,POST,PATCH,DELETE,HEAD");
 
             }
         }
