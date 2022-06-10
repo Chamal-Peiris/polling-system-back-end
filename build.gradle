@@ -38,6 +38,9 @@ dependencies {
     // https://mvnrepository.com/artifact/com.h2database/h2
     testImplementation group: 'com.h2database', name: 'h2', version: '2.1.212'
     // https://mvnrepository.com/artifact/org.eclipse/yasson
+    // https://mvnrepository.com/artifact/org.modelmapper/modelmapper
+    implementation group: 'org.modelmapper', name: 'modelmapper', version: '3.1.0'
+
 
 
 

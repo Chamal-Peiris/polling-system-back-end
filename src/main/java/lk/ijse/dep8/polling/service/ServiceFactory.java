@@ -1,5 +1,7 @@
 package lk.ijse.dep8.polling.service;
 
+import lk.ijse.dep8.polling.service.custom.impl.PollServiceImpl;
+
 public class ServiceFactory {
 
     private static ServiceFactory serviceFactory;
@@ -15,7 +17,7 @@ public class ServiceFactory {
     public <T extends SuperService> T getService(ServiceType type){
         switch (type){
             case POLL:
-                return null;
+                return (T) new PollServiceImpl();
             default:
                 return null;
         }

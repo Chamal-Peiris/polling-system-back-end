@@ -1,7 +1,7 @@
 package lk.ijse.dep8.polling.service.custom;
 
 import lk.ijse.dep8.polling.dto.PollDTO;
-import lk.ijse.dep8.polling.service.util.SuperService;
+import lk.ijse.dep8.polling.service.SuperService;
 
 import java.util.List;
 
