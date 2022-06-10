@@ -1,5 +1,9 @@
 package lk.ijse.dep8.polling.api;
 
+import jakarta.json.bind.Jsonb;
+import jakarta.json.bind.JsonbBuilder;
+import jakarta.json.bind.JsonbException;
+import lk.ijse.dep8.polling.dto.PollDTO;
 import lk.ijse.dep8.polling.util.HttpServlet2;
 import lk.ijse.dep8.polling.util.ResponseStatusException;
 
@@ -30,6 +34,8 @@ public class PollServlet extends HttpServlet2 {
            }
            int polId=Integer.parseInt(matcher.group(1));
            //System.out.println("Get a Poll");
+           /*Todo:Get a poll from the service layer*/
+
        }
     }
 
@@ -40,6 +46,31 @@ public class PollServlet extends HttpServlet2 {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        System.out.println("post");
+        /*validate the url*/
+        if(req.getPathInfo()!=null&&!req.getPathInfo().equals("/")){
+            System.out.println("Invalid End Point");
+        }
+        /*validate the content type*/
+        if(req.getContentType()==null||!req.getContentType().toLowerCase().startsWith("application/json")){
+            System.out.println("Invalid content Type");
+        }
+
+        try{
+            Jsonb jsonb = JsonbBuilder.create();
+            PollDTO pollDTO = jsonb.fromJson(req.getReader(), PollDTO.class);
+            if(pollDTO.getId()!=null){
+                throw new ResponseStatusException(400,"Id should be empty");
+            } else if (pollDTO.getCreatedBy()==null||pollDTO.getCreatedBy().trim().isEmpty()) {
+                throw new ResponseStatusException(400,"Invalid user");
+            }else if(pollDTO.getUpVotes() != 0||pollDTO.getDownVotes()!=0){
+                throw new ResponseStatusException(400,"Invalid votes");
+            } else if (pollDTO.getTitle()==null||pollDTO.getTitle().trim().isEmpty()) {
+                throw new ResponseStatusException(400,"Invalid title");
+            }
+
+            /*Todo:Request to save this pol from service*/
+        }catch (JsonbException e){
+            throw new ResponseStatusException(400,"Invalid JSON");
+        }
     }
 }
