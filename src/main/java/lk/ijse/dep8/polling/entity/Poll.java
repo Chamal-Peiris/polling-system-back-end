@@ -1,4 +1,23 @@
 package lk.ijse.dep8.polling.entity;
 
-public class Poll {
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import javax.persistence.*;
+
+@Data @AllArgsConstructor @NoArgsConstructor @Entity
+public class Poll implements SuperEntity{
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+    @Column(nullable = false)
+    private String title;
+    @Column(name = "up_votes",nullable = false)
+    private int upVotes;
+    @Column(name = "down_votes",nullable = false)
+    private int downVotes;
+    @Column(name = "create_by",nullable = false)
+    private String createdBy;
+
 }
