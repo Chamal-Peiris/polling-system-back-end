@@ -18,13 +18,16 @@ public class HttpServlet2 extends HttpServlet {
 
     private final Logger logger = Logger.getLogger(HttpServlet2.class.getName());
 
-    protected void doPatch(HttpServletRequest req,HttpServletResponse resp) throws  ServletException, IOException{}
+    protected  void doPatch(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException{
+
+    }
+
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
-            if(req.getMethod().equals("PATCH")){
-                doPatch(req,resp);
-            }else {
+            if (req.getMethod().equals("PATCH")){
+                doPatch(req, resp);
+            }else{
                 super.service(req, resp);
             }
         } catch (Throwable t) {
@@ -42,16 +45,16 @@ public class HttpServlet2 extends HttpServlet {
 
             resp.setContentType("application/json");
 
-            HttpResponseErrorMessage errorMsg;
+            HttpResponseErrorMsg errorMsg;
             if (t instanceof ResponseStatusException){
                 ResponseStatusException rse = (ResponseStatusException) t;
                 resp.setStatus(rse.getStatus());
-                errorMsg = new HttpResponseErrorMessage(new Date().getTime(),
+                errorMsg = new HttpResponseErrorMsg(new Date().getTime(),
                         rse.getStatus(),
                         sw.toString(), t.getMessage(), req.getRequestURI());
             }else{
                 resp.setStatus(500);
-                errorMsg = new HttpResponseErrorMessage(new Date().getTime(),
+                errorMsg = new HttpResponseErrorMsg(new Date().getTime(),
                         500,
                         sw.toString(), t.getMessage(), req.getRequestURI());
             }

@@ -19,13 +19,10 @@ import java.util.regex.Pattern;
 public class PollServlet extends HttpServlet2 {
 
     private int getPollId(HttpServletRequest req) {
-        if (req.getPathInfo() == null) throw new RuntimeException("Invalid path");
+        if (req.getPathInfo() == null) throw new ResponseStatusException(404, "Invalid end point");
         Matcher matcher = Pattern.compile("^/(\\d+)/?$").matcher(req.getPathInfo());
-        if (!req.getPathInfo().matches("/(\\d+)/?")) {
-            System.out.println("Invalid");
-        }
-        int polId = Integer.parseInt(matcher.group(1));
-        return polId;
+        if (!matcher.find()) throw new ResponseStatusException(404, "Invalid poll id");
+        return Integer.parseInt(matcher.group(1));
     }
 
     @Override
