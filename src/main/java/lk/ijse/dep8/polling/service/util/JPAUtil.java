@@ -9,15 +9,15 @@ public abstract class JPAUtil {
     private static EntityManagerFactory emf=buildEntityManagerFactory();
 
     private static EntityManagerFactory buildEntityManagerFactory(){
-        Properties properties = new Properties();
+        Properties prop = new Properties();
         try {
-            String profile=System.getProperty("app.profiles.active","test");
-            properties.load(  JPAUtil.class.getResourceAsStream(profile.equals("test")?"/application-test.properties":"/application.properties"));
+            String profile = System.getProperty("app.profiles.active", "test");
+            prop.load(JPAUtil.class.getResourceAsStream(
+                    profile.equals("test") ? "/application-test.properties" : "/application.properties"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-        return Persistence.createEntityManagerFactory("poll",properties);
+        return Persistence.createEntityManagerFactory("poll", prop);
     }
     public static EntityManagerFactory getEntityManageFactory(){
         return emf;

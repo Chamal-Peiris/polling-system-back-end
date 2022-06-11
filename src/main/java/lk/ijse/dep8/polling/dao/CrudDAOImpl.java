@@ -36,7 +36,7 @@ public abstract   class CrudDAOImpl<T extends SuperEntity,ID extends Serializabl
 
     @Override
     public List<T> findAll() {
-     return   em.createQuery("SELECT e FROM"+entityClassObj.getName()+"e",entityClassObj).getResultList();
+        return em.createQuery("SELECT e FROM " + entityClassObj.getName() + " e", entityClassObj).getResultList();
     }
 
     @Override
