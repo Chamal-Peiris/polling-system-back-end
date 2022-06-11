@@ -1,4 +1,4 @@
-# Google Task Clone `Polling-System-Back-End`
+# `Polling-System-Back-End`
 
 ## Version
 1.0.0
